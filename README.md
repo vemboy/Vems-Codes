@@ -4,7 +4,7 @@
               
               1 ) Discord scraping bot.
               
-              Websites
+              Websites:
               
               1 ) http://theastraeusinitiative.com/
               2 ) http://zafiare.com/
