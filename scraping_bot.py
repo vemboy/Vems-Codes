@@ -29,6 +29,8 @@ async def on_ready():
     print('------')
 
 
+    
+                                        # send function, does NOT have to do with the scraping bot
 @bot.command(pass_context=True)
 async def send( ctx, channel_id: str = None,  message: str = None,  user: discord.Member = None):
     user = user or ctx.author
