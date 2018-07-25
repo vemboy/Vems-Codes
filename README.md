@@ -2,7 +2,7 @@
 
               Projects:
               
-                1 ) Discord scraping bot. (Domainer)
+                1 ) Discord scraping bot ( Domainer )
               
               Websites:
               
