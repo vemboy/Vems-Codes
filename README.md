@@ -2,10 +2,10 @@
 
               Projects:
               
-                1 ) Discord scraping bot ( Domainer )
+                1 ) Discord scraping bot named Domainer ( Active )
               
               Websites:
               
-                1 ) http://theastraeusinitiative.com
-                2 ) http://zafiare.com
+                1 ) http://theastraeusinitiative.com ( Active )
+                2 ) http://zafiare.com ( Active )
                 3 ) http://vemboy.com ( Coming soon )
