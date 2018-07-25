@@ -9,3 +9,4 @@
     send -> Channel ID + text = Sending text to specific channel with ID specified with username.
     
     send.private -> Channel ID + text = Sending text to specific channel with ID specified without username.
+
