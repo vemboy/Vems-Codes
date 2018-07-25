@@ -1,1 +1,11 @@
 
+
+  Domainer V 1.0
+  
+  Functions:
+    
+    mix -> keyword1 + keyword2 = output domains + existince ( HTT code ) + purpose of website.
+    
+    send -> Channel ID + text = Sending text to specific channel with ID specified with username.
+    
+    send.private -> Channel ID + text = Sending text to specific channel with ID specified without username.
