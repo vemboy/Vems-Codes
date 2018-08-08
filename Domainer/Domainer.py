@@ -2,8 +2,8 @@ import discord
 from discord.ext import commands    
 import asyncio
 import time
-import time
 import requests
+import aiohttp
 
 
 
@@ -20,7 +20,7 @@ bot.remove_command('help')
 
 print (discord.__version__)
 
-
+    
 @bot.event
 async def on_ready():
     print('Logged in as')
@@ -77,12 +77,14 @@ async def help_send(ctx):
     except requests.exceptions.ConnectionError:
         return False"""
 
-def grab_website(url):
+async def grab_website(url):
     try:
         response = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36'})
-        if response.status_code == 200:
-            return response.content
-    except requests.exceptions.ConnectionError:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                if resp.status == 200:
+                    return response.content
+    except aiohttp.client_exceptions.ClientConnectorError:
         return False
 
 def remove_symbols(test_str):
@@ -149,13 +151,11 @@ def parse_html(html):
 
 
 ############# TO DO
-# 4) Move all functions to top
-# 5) Name functions real words
 # 6) async
 # 7) combine parsing with checking if it exists
 
 @bot.command(pass_context=True)
-async def mix(ctx, domain_1: str = None, domain_2: str = None):
+async def mix(ctx, domain_1: str = None, domain_2: str = None, domain_3: str = None, domain_4: str = None, domain_5: str = None):
     await ctx.send('May take upto 1 minute')
     possible_domain_list = []
     start_time = time.time()
@@ -206,9 +206,10 @@ async def mix(ctx, domain_1: str = None, domain_2: str = None):
         ))
 
     for url in possible_domain_list:
-        page_html = grab_website(url)
-        if page_html:
+        page_html = await grab_website(url)
+        if page_html:   
             #appending domain
+
             existing_domain_list.append(url)
 
             website_meaning = parse_html(page_html)
