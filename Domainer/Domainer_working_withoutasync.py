@@ -308,4 +308,4 @@ async def mix(ctx, domain_1: str = None, domain_2: str = None, domain_3: str = N
 
 
 
-bot.run("NDg0NDM2NjM2NDM3MDUzNDUw.DmiBHQ.VA9NllYSd9P2oFBvxs_eKLNKCU4")
+
