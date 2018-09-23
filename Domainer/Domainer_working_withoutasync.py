@@ -306,6 +306,20 @@ async def mix(ctx, domain_1: str = None, domain_2: str = None, domain_3: str = N
     
 
 
+"""async def grab_website(url):
+    try:
+        response = requests.get(url, headers = {'user-agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) ''AppleWebKit/537.36 (KHTML, like Gecko) ''Chrome/45.0.2454.101 Safari/537.36'),}   )
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                if resp.status == 200:
+                    return response.content
+    except aiohttp.client_exceptions.ClientConnectorError:
+        return False"""
 
+#this is the Async code i tried to write
+#this the the example i tried following https://terriblecode.com/blog/asynchronous-http-requests-in-python/
+#     TO RUN ALL OF THIS
+# Go to discord and create a profile then open this link -> https://discord.gg/ECeFrM and accept the invite and type a =mix command in #general
+# = mix (without a space) and 2-5 keywords for input and output!
 
 
