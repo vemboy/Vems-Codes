@@ -4,7 +4,9 @@ import asyncio
 import time
 import time
 import requests
-
+import urllib.request
+import os, requests, sys, json
+import random
 
 from PIL import Image
 from io import BytesIO
@@ -107,7 +109,7 @@ def remove_symbols(test_str):
 
 def parse_html(html):
     page_soup = soup(html, "html.parser")
-    print("parsed       ")
+    print("parsed")
     #checking to extract <h> tag or <title> tag
     try:
         h = str(page_soup.body.h1 or page_soup.body.h2 or page_soup.body.h3)
@@ -167,6 +169,7 @@ def parse_html(html):
 async def mix(ctx, domain_1: str = None, domain_2: str = None, domain_3: str = None, domain_4: str = None, domain_5: str = None):
     await ctx.send('May take upto 1 minute')
 
+    part0 = []
     part1 = []
     part2 = []
     part3 = []
@@ -176,8 +179,10 @@ async def mix(ctx, domain_1: str = None, domain_2: str = None, domain_3: str = N
     part7 = []
     part8 = []
     part9 = []
-    part10 = []
+
+    part_list = [[],[],[],[],[],[],[],[],[],[]]
     
+
     possible_domain_list = []
     start_time = time.time()
     all_domains = []
@@ -193,8 +198,17 @@ async def mix(ctx, domain_1: str = None, domain_2: str = None, domain_3: str = N
                 real_var_counter = real_var_counter + 1
         var_counter = var_counter + 1
     print(existing_vars)
+    number_of_possibilities = 0
+    if(len(existing_vars) == 2):
+        number_of_possibilities = 1
+    elif(len(existing_vars) == 3):
+        number_of_possibilities = 3
+    elif(len(existing_vars) == 4):
+        number_of_possibilities = 6
+    elif(len(existing_vars) == 5):
+        number_of_possibilities = 10
 
-
+    times_done = 0
     var_z = 0
     var_y = 1
     
@@ -202,7 +216,9 @@ async def mix(ctx, domain_1: str = None, domain_2: str = None, domain_3: str = N
         replace_y = var_y
         while(var_y < len(existing_vars)):
             print("mixing " + str(var_z) + " with " + str(var_y))
-            possible_domain_list.extend((   
+            
+
+            part_list[times_done].extend((   
             # simple
             'http://www.' + existing_vars[var_z] + existing_vars[var_y] + '.com',
             'http://www.' + existing_vars[var_y] + existing_vars[var_z] + '.com',
@@ -242,79 +258,168 @@ async def mix(ctx, domain_1: str = None, domain_2: str = None, domain_3: str = N
                 'http://www.' + domain_1_new + domain_2_new + '.com',
                 'http://www.' + domain_2_new + domain_1_new + '.com'
                 ))
+            times_done = times_done + 1
             var_y = var_y + 1
             #print("var_y is now: " + str(var_y))
         var_y = replace_y + 1
         #print("var_y new is now: " + str(var_y))
         var_z = var_z + 1
         #print("var_z is now: " + str(var_z))
+    
+    print("___________________")
+    print("Part List: ")
+    print(part_list)
+    part_list_updated = [x for x in part_list if x != []]
+    print("___________________")
+    print("Part List Updated: ")
+    print(part_list_updated)
+    part_list_updated_counter = 0   
+    while(part_list_updated_counter < len(part_list_updated)):
+        for url in part_list_updated[part_list_updated_counter]:
+            page_html = grab_website(url)
+            if page_html:
 
 
+                #        200's
+                if(response.status_code == 200):
+                    #appending domain
+                    locals()['part' + str(part_list_updated_counter)].append("<" + url + ">")
 
-    for url in possible_domain_list:
-        page_html = grab_website(url)
-        if page_html:
-
-
-            #        200's
-            if(response.status_code == 200):
-                #appending domain
-                all_domains.append("<" + url + ">")
-
-                website_meaning = parse_html(page_html)
-                all_domains.append('**' + str(website_meaning) + '**' + "\n")
-                #existing_domains_list.extend((url, "Status code: 200", ))
-            #        300's
-            if(response.status_code == 301):
-                #appending domain
-                all_domains.append("<" + url + ">")
-                all_domains.append('**' + "Perma moved" + '**' + "\n")
+                    website_meaning = parse_html(page_html)
+                    locals()['part' + str(part_list_updated_counter)].append('**' + str(website_meaning) + '**' + "\n")
+                    #existing_domains_list.extend((url, "Status code: 200", ))
                 
-            if(response.status_code == 302 or response.status_code == 307):
-                #appending domain
-                all_domains.append("<" + url + ">")
-                all_domains.append('**' + "Redirection" + '**' + "\n")
+                
+                #        300's
+                if(response.status_code == 301):
+                    #appending domain
+                    locals()['part' + str(part_list_updated_counter)].append("<" + url + ">")
+                    locals()['part' + str(part_list_updated_counter)].append('**' + "Perma moved" + '**' + "\n")
+                    
+                if(response.status_code == 302 or response.status_code == 307):
+                    #appending domain
+                    locals()['part' + str(part_list_updated_counter)].append("<" + url + ">")
+                    locals()['part' + str(part_list_updated_counter)].append('**' + "Redirection" + '**' + "\n")
+            
+                
+                #        500's
+                if(response.status_code == 503):
+                    #appending domain
+                    locals()['part' + str(part_list_updated_counter)].append("<" + url + ">")
+                    locals()['part' + str(part_list_updated_counter)].append('**' + "Under maintenance" + '**' + "\n")
+                    
+                if(response.status_code == 500):
+                    #appending domain
+                    locals()['part' + str(part_list_updated_counter)].append("<" + url + ">")
+                    locals()['part' + str(part_list_updated_counter)].append('**' + "Server Error" + '**' + "\n")
+                    
+                if(response.status_code == 550):
+                    #appending domain
+                    locals()['part' + str(part_list_updated_counter)].append("<" + url + ">")
+                    locals()['part' + str(part_list_updated_counter)].append('**' + "Permission Denied!" + '**' + "\n")
+            else:
+                
+                locals()['part' + str(part_list_updated_counter)].append("<" + url + ">")
+                locals()['part' + str(part_list_updated_counter)].append("**Website does not exist!**" + "\n")
+        await ctx.send( " ".join(map(str,locals()['part' + str(part_list_updated_counter)])))
+        if(part_list_updated_counter < len(part_list_updated) - 1):   
+
+            await ctx.send("Still printing")
+        print('appending to: part' + str(part_list_updated_counter))
+        locals()['part' + str(part_list_updated_counter)] = part_list_updated[part_list_updated_counter]
+        part_list_updated_counter = part_list_updated_counter + 1
         
-            
-            #        500's
-            if(response.status_code == 503):
-                #appending domain
-                all_domains.append("<" + url + ">")
-                all_domains.append('**' + "Under maintenance" + '**' + "\n")
-                
-            if(response.status_code == 500):
-                #appending domain
-                all_domains.append("<" + url + ">")
-                all_domains.append('**' + "Server Error" + '**' + "\n")
-                
-            if(response.status_code == 550):
-                #appending domain
-                all_domains.append("<" + url + ">")
-                all_domains.append('**' + "Permission Denied!" + '**' + "\n")
-        else:
-            
-            all_domains.append("<" + url + ">")
-            all_domains.append("**Website does not exist!**" + "\n")
 
-    await ctx.send( " ".join(map(str,all_domains)))
-    print('User has mixed with these 2 keywoards: ' + domain_1 + ' and ' + domain_2)
+
+    
+    
+
+    
+    print('User has mixed with these    2 keywoards: ' + domain_1 + ' and ' + domain_2)
     
 
 
     end_time = time.time()
+    await ctx.send("Done printing: RunTime: " + str(end_time - start_time) + " Seconds!")
     print("took the bot: " + str(end_time - start_time) + " seconds to run")
+    
+####Functions for scrape
+
+
+async def scrape_website(ctx,html,scrape_type):
+    page_soup = soup(html, "html.parser")
+    
+    randomnum = random.uniform(1.1, 20.1)
+    os.chdir("C:/Users/vemboy/Desktop/discord_bot/gists")
+    f = open(str(randomnum) + "scraped.html",'w')
+    os.system("cd..")
+    #os.chdir("C:/Users/vemboy/Desktop/discord_bot")
+    filename = os.path.basename(str(randomnum) + "scraped.html")
+
+    content=open(filename, 'r').read()
+    r = requests.post('https://api.github.com/gists',json.dumps({'files':{filename:{"content":str(page_soup(scrape_type))}}}),auth=requests.auth.HTTPBasicAuth("vemboy", "cupnoodles1")) 
+    await ctx.send(r.json()['html_url'])
+
+
     
 
 
-"""async def grab_website(url):
-    try:
-        response = requests.get(url, headers = {'user-agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) ''AppleWebKit/537.36 (KHTML, like Gecko) ''Chrome/45.0.2454.101 Safari/537.36'),}   )
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                if resp.status == 200:
-                    return response.content
-    except aiohttp.client_exceptions.ClientConnectorError:
-        return False"""
+
+
+
+
+
+
+@bot.command(pass_context=True)
+async def scrape(ctx, website: str = None, type_of_scrape: str = None):
+    
+
+
+    if ".com" not in website:
+        website = 'http://www.' + website + '.com'
+    elif "www" not in website and ".com" in website:
+        website = 'http://www.' + website
+   
+    
+    if(urllib.request.urlopen(str(website))):
+        print("----------")
+        print("Website_exists!")
+        print(website)
+        print("----------")
+        
+        source = urllib.request.urlopen(str(website)).read()
+
+        await scrape_website(ctx,source,type_of_scrape)
+
+    else: 
+        await ctx.send("Website does not exist!")
+
+@bot.command(pass_context=True)
+async def help(ctx):
+
+    await ctx.send("```Domainer Bot```")
+    await ctx.send("** \n **")
+    await ctx.send("```Mix \n How to use: Use by typing the command =mix then 2-5 keywords. \n Example: '=mix i love domainer bot' \n Do not: enter anything but a string(word), do not enter less than 2 words and more than 5 words! (Max 6 inputs!) ```")
+    await ctx.send("```Scrape \n How to use: Use by typing the command =scrape then a domain, and the tag you want scraped, plus the amount which is (a number or 'all'), \n Example: '=scrape https://www.google.com/ div 20' \n Do not: Input a website with 'www.' + 'example_website' + '.com' type string. (Max 4 inputs!) ```")
+    """embed = discord.Embed(
+        title = 'These are all the things you need to know while using the scrape command on the Domainer bot!',
+        
+        colour = discord.Colour.blue()
+    )
+
+    #embed.set_footer(text='this is a footer')
+    #embed.set_image(url='https://cdn.discordapp.com/attachments/492580391925055489/496345870040825876/1497562508467.jpg')
+    embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/495627060304412873/496370433453457429/rsz_moux.jpg')
+    embed.set_author(name='Scrape Help')
+    
+    embed.add_field(name='```How to use!```',value='To use the scrape command write ``=mix`` followed by a domain, for example ``https://www.google.com/`` and finally a HTML tag you want to export, for example ``div`` \n',inline=False)
+    embed.add_field(name='** \n **',value='** \n **',inline=False)
+    embed.add_field(name='```Do not!```',value='input a website with ``www.`` " + "``" + "example_website" + "``" + " ``.com`` string! \n' + 'Max 3 **inputs!** ``=scrape`` + ``domain`` + ``tag to scrape`` \n',inline=False)
+    
+    
+
+    await ctx.send(embed=embed)"""
+
 
 #this is the Async code i tried to write
 #this the the example i tried following https://terriblecode.com/blog/asynchronous-http-requests-in-python/
