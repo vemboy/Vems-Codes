@@ -8,6 +8,8 @@ import urllib.request
 import os, requests, sys, json
 import random
 
+
+
 from PIL import Image
 from io import BytesIO
 from functools import partial
@@ -346,33 +348,51 @@ async def mix(ctx, domain_1: str = None, domain_2: str = None, domain_3: str = N
 ####Functions for scrape
 
 
-async def scrape_website(ctx,html,scrape_type):
-    page_soup = soup(html, "html.parser")
+async def scrape_website(ctx,html,scrape_type,amount_to_scrape):
     
-    randomnum = random.uniform(1.1, 20.1)
-    os.chdir("C:/Users/vemboy/Desktop/discord_bot/gists")
-    f = open(str(randomnum) + "scraped.html",'w')
-    os.system("cd..")
-    #os.chdir("C:/Users/vemboy/Desktop/discord_bot")
-    filename = os.path.basename(str(randomnum) + "scraped.html")
+    if(amount_to_scrape == "all_true"):
 
-    content=open(filename, 'r').read()
-    r = requests.post('https://api.github.com/gists',json.dumps({'files':{filename:{"content":str(page_soup(scrape_type))}}}),auth=requests.auth.HTTPBasicAuth("mygithubusername", "mygithubpassword")) 
-    await ctx.send(r.json()['html_url'])
+        
+        page_soup = soup(html, "html.parser")
+        
+        randomnum = random.uniform(1.1, 20.1)
+        os.chdir("C:/Users/vemboy/Desktop/discord_bot/gists")
+        f = open(str(randomnum) + "scraped.html",'w')
+        os.system("cd..")
+        #os.chdir("C:/Users/vemboy/Desktop/discord_bot")
+        filename = os.path.basename(str(randomnum) + "scraped.html")
+
+        content=open(filename, 'r').read()
+        r = requests.post('https://api.github.com/gists',json.dumps({'files':{filename:{"content":str(page_soup.find_all(scrape_type))}}}),auth=requests.auth.HTTPBasicAuth(username, password)) 
+        await ctx.send(r.json()['html_url'])
+
+    elif(amount_to_scrape != "all_true"):
+
+        page_soup = soup(html, "html.parser")
+        
+        randomnum = random.uniform(1.1, 20.1)
+        os.chdir("C:/Users/vemboy/Desktop/discord_bot/gists")
+        f = open(str(randomnum) + "scraped.html",'w')
+        os.system("cd..")
+        #os.chdir("C:/Users/vemboy/Desktop/discord_bot")
+        filename = os.path.basename(str(randomnum) + "scraped.html")
+
+        content=open(filename, 'r').read()
+        r = requests.post('https://api.github.com/gists',json.dumps({'files':{filename:{"content":str(page_soup.find_all(scrape_type, limit=int(amount_to_scrape)))}}}),auth=requests.auth.HTTPBasicAuth(username, password)) 
+        await ctx.send(r.json()['html_url'])
+
 
 
     
-
-
-
-
-
-
-
 
 @bot.command(pass_context=True)
-async def scrape(ctx, website: str = None, type_of_scrape: str = None):
+async def scrape(ctx, website: str = None, type_of_scrape: str = None, amount_to_scrape: str = None):
     
+    if(amount_to_scrape == "all"):
+       amount_to_scrape = "all_true"
+    
+    user_agent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7'
+    hdrs={'User-Agent':user_agent,} 
 
 
     if ".com" not in website:
@@ -387,9 +407,14 @@ async def scrape(ctx, website: str = None, type_of_scrape: str = None):
         print(website)
         print("----------")
         
-        source = urllib.request.urlopen(str(website)).read()
+        request=urllib.request.Request(str(website),None,hdrs)
+        response = urllib.request.urlopen(request)
+        source = response.read()
+        #the_request = request.get(str(website),headers = hdr)
+        #source = urllib2.urlopen(the_request).read()
+        #source = urllib.request.urlopen(str(website),headers=hdr).read()
 
-        await scrape_website(ctx,source,type_of_scrape)
+        await scrape_website(ctx,source,type_of_scrape,amount_to_scrape) 
 
     else: 
         await ctx.send("Website does not exist!")
@@ -419,6 +444,8 @@ async def help(ctx):
     
 
     await ctx.send(embed=embed)"""
+
+
 
 
 #this is the Async code i tried to write
