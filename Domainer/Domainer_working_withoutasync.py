@@ -357,7 +357,7 @@ async def scrape_website(ctx,html,scrape_type):
     filename = os.path.basename(str(randomnum) + "scraped.html")
 
     content=open(filename, 'r').read()
-    r = requests.post('https://api.github.com/gists',json.dumps({'files':{filename:{"content":str(page_soup(scrape_type))}}}),auth=requests.auth.HTTPBasicAuth("vemboy", "cupnoodles1")) 
+    r = requests.post('https://api.github.com/gists',json.dumps({'files':{filename:{"content":str(page_soup(scrape_type))}}}),auth=requests.auth.HTTPBasicAuth("mygithubusername", "mygithubpassword")) 
     await ctx.send(r.json()['html_url'])
 
 
