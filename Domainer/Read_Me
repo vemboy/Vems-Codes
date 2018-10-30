@@ -6,6 +6,8 @@
     
     mix -> keyword1 + keyword2 = output domains + existince ( HTT code ) + purpose of website.
     
+    scrape -> website + HTML TAG + (number or all)
+    
     send -> Channel ID + text = Sending text to specific channel with ID specified with username.
     
     send.private -> Channel ID + text = Sending text to specific channel with ID specified without username.
